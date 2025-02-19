@@ -1,0 +1,362 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+    <style>
+        .table a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .table a:hover {
+            text-decoration: underline;
+        }
+
+        .right-float {
+            float: right;
+        }
+    </style>
+
+    <div class="container mt-4" style="color: white;">
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>{{ rig.rig_number }}</h2>
+            <div>
+                <!-- Botón para editar -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editRigModal">
+                    Editar
+                </button>
+                <!-- Botón para eliminar -->
+                <form action="{{ url_for('rigs.delete_rig', rig_id=rig.id) }}" method="post" style="display: inline;">
+                    <input type="submit" value="Delete" class="btn btn-danger"
+                           onclick="return confirm('Are you sure?')">
+                </form>
+            </div>
+        </div>
+        <table class="table table-bordered" style="color: white;">
+            <tbody>
+            <tr>
+                <th>Rig Number</th>
+                <td>{{ rig.rig_number }}</td>
+            </tr>
+            <!-- Agrega más filas para otros detalles del rig -->
+            </tbody>
+        </table>
+
+        <h3>Componentes del Rig</h3>
+        <table class="table table-bordered" style="color: white;">
+            <thead>
+            <tr>
+                <th>Componente</th>
+                <th>Número de Serie</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th>Canopy</th>
+                <td>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if rig.canopy %}
+                                <a href="{{ url_for('components.show_component', component_id=rig.canopy.id) }}">{{ rig.canopy.serial_number }}</a>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if rig.canopy %}
+                                <button type="button" class="btn btn-danger btn-sm right-float" data-toggle="modal"
+                                        data-target="#removeComponentFromRigModal-{{ rig.canopy.id }}">&times;
+                                </button>
+                            {% else %}
+                                <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
+                                        data-target="#addCanopyModal">+
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            
+            <tr>
+                <th>Container</th>
+                <td>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if rig.container %}
+                                <a href="{{ url_for('components.show_component', component_id=rig.container.id) }}">{{ rig.container.serial_number }}</a>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if rig.container %}
+                                <button type="button" class="btn btn-danger btn-sm right-float" data-toggle="modal"
+                                        data-target="#removeComponentFromRigModal-{{ rig.container.id }}">&times;
+                                </button>
+                            {% else %}
+                                <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
+                                        data-target="#addCanopyModal-{{ rig.container.id }}">+
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <th>Reserve</th>
+                <td>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if rig.reserve %}
+                                <a href="{{ url_for('components.show_component', component_id=rig.reserve.id) }}">{{ rig.reserve.serial_number }}</a>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if rig.reserve %}
+                                <button type="button" class="btn btn-danger btn-sm right-float" data-toggle="modal"
+                                        data-target="#removeCanopyModal">&times;
+                                </button>
+                            {% else %}
+                                <button type="button" class="btn btn-success btn-sm right-float" data-toggle="modal"
+                                        data-target="#addCanopyModal">+
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <th>Aad</th>
+                <td>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if rig.aad %}
+                                <a href="{{ url_for('components.show_component', component_id=rig.aad.id) }}">{{ rig.aad.serial_number }}</a>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if rig.aad %}
+                                <button type="button" class="btn btn-danger btn-sm right-float" data-toggle="modal"
+                                        data-target="#removeCanopyModal">&times;
+                                </button>
+                            {% else %}
+                                <button type="button" class="btn btn-success btn-sm right-float" data-toggle="modal"
+                                        data-target="#addCanopyModal">+
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h3>Registros de Rigging</h3>
+            <!-- Botón para añadir un nuevo registro de rigging -->
+            <button type="button" class="btn btn-success" data-toggle="modal"
+                    data-target="#newRigRiggingRecordModal">
+                Añadir
+            </button>
+        </div>
+
+        <table class="full-width-table-rig-rigging" style="color: white;">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Rigger</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in riggings %}
+                <tr class="clickable-row" data-id="{{ item.id }}">
+                    <td>{{ item.id if item.id else '' }}</td>
+                    <td>{{ item.date if item.date else '' }}</td>
+                    <td>{{ item.rigger if item.rigger else '' }}</td>
+                    <td>{{ item.type_rigging.name if item.type_rigging else '' }}</td>
+                    <td>{{ item.description | default('') }}</td>
+                    <td>
+                        <a href="{{ url_for('rigging.show_rigging', rigging_id=item.id) }}">{{ item.description | default('') }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Aquí puedes agregar la sección de registros de rigging como en el componente, si es necesario -->
+    </div>
+
+    <!-- Modal para editar -->
+    <div class="modal fade" id="editRigModal" tabindex="-1" role="dialog"
+         aria-labelledby="editRigModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form action="{{ url_for('rigs.edit_rig', rig_id=rig.id) }}" method="post">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editRigModalLabel">Edit Rig</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="rig_number">Rig Number:</label>
+                        <input type="text" name="rig_number" id="rig_number" value="{{ rig.rig_number }}" required><br>
+
+                        <label for="canopy">Canopy:</label>
+                        <select name="canopy" id="canopy">
+                            <option value="">-- Select Canopy --</option>
+                            {% for canopy in available_canopies %}
+                                <option value="{{ canopy.serial_number }}"
+                                        {% if canopy.serial_number == rig.canopy_serial %}selected{% endif %}>{{ canopy.serial_number }}</option>
+                            {% endfor %}
+                        </select><br>
+
+                        <label for="container">Container:</label>
+                        <select name="container" id="container">
+                            <option value="">-- Select Container --</option>
+                            {% for container in available_containers %}
+                                <option value="{{ container.serial_number }}"
+                                        {% if container.serial_number == rig.container_serial %}selected{% endif %}>{{ container.serial_number }}</option>
+                            {% endfor %}
+                        </select><br>
+
+                        <label for="reserve">Reserve:</label>
+                        <select name="reserve" id="reserve">
+                            <option value="">-- Select Reserve --</option>
+                            {% for reserve in available_reserves %}
+                                <option value="{{ reserve.serial_number }}"
+                                        {% if reserve.serial_number == rig.reserve_serial %}selected{% endif %}>{{ reserve.serial_number }}</option>
+                            {% endfor %}
+                        </select><br>
+
+                        <label for="aad">AAD:</label>
+                        <select name="aad" id="aad">
+                            <option value="">-- Select Aad --</option>
+                            {% for aad in available_aads %}
+                                <option value="{{ aad.serial_number }}"
+                                        {% if aad.serial_number == rig.aad_serial %}selected{% endif %}>{{ aad.serial_number }}</option>
+                            {% endfor %}
+                        </select><br>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Registro</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Nuevo Rigging record -->
+    <div class="modal fade" id="newRigRiggingRecordModal" tabindex="-1" aria-labelledby="newRigRiggingRecordModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="{{ url_for('rigging.rigging_add') }}" method="post">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="newRigRiggingRecordModalLabel">Add New Rigging</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="date">Fecha:</label>
+                        <input type="date" name="date" id="date" required><br>
+
+                        <label for="type_rigging">Tipo de Rigging:</label>
+                        <select name="type_rigging" id="type_rigging" required>
+                            {% for type in rigging_types %}
+                                <option value="{{ type.id }}">{{ type.name }}</option>
+                            {% endfor %}
+                        </select><br>
+
+                        <label for="serial_numbers">Seleccionar número de serie:</label>
+
+                        <input type="hidden" name="rig_id" value="{{ rig.id }}">
+                        º
+                        <label for="description">Descripción:</label>
+                        <textarea name="description" id="description">{{ rigging.description }}</textarea>
+                        <br>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Rig</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Añadir Canopy -->
+    <div class="modal fade" id="addComponentToRigModal" tabindex="-1" aria-labelledby="addComponentToRigModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="addComponentToRigForm" action="{{ url_for('components.add_component') }}" method="post">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addComponentToRigModalLabel">Add Canopy</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    {% for component in rig.components %}
+        <div class="modal fade" id="removeComponentFromRigModal-{{ component.id }}" tabindex="-1"
+             aria-labelledby="removeComponentFromModalLabel-{{ component.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <form id="removeComponentForm-{{ component.id }}" method="post"
+                      action="{{ url_for('components.umount_component', component_id=component.id) }}"
+                      onsubmit="return validateAndSubmitForm({{ component.id }})">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="removeComponentFromModalLabel-{{ component.id }}">Remove
+                                Component</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to remove this component from the rig?</p>
+                            <label for="current_aad_jumps-{{ component.id }}">Current AAD Jumps:</label>
+                            <input type="number" name="current_aad_jumps" id="current_aad_jumps-{{ component.id }}"
+                                   required>
+                            <input type="hidden" name="aad_jumps_on_mount" id="aad_jumps_on_mount-{{ component.id }}"
+                                   value="{{ component.aad_jumps_on_mount }}">
+                            <div id="error-message-{{ component.id }}" class="text-danger mt-2"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-danger">Remove Component</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+
+
+
+
+
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+
+
+{% endblock %}

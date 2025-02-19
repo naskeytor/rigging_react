@@ -1,0 +1,190 @@
+html, body {
+    background-color: #292c31;
+    font-family: Arial, sans-serif;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/*
+.navbar {
+    background-color: #343940;
+    overflow: hidden;
+    padding: 14px 16px;
+}
+*/
+
+.navbar h1 {
+    color: #eeefef;
+    text-align: left;
+    margin: 0;
+}
+
+.container {
+    background-color: #40444d; /* Un gris más claro que #343940 575c66 */
+    width: 80%; /* O el ancho que desees */
+    padding: 20px; /* Espaciado interno */
+    margin: 50px auto 50px; /* Margen superior e inferior */
+    min-height: calc(100vh - 100px - 40px); /* 100px = 50px de margen superior + 50px de margen inferior */
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho y la altura */
+}
+
+
+/* Puedes ajustar los valores de margin, width y padding según tus necesidades */
+
+.tabs ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333; /* Color de fondo de las pestañas */
+}
+
+.tabs li {
+    float: left;
+}
+
+.tabs li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.tabs li a:hover {
+    background-color: #575c66; /* Color cuando se pasa el mouse por encima */
+}
+
+/* Estilos compartidos para ambas tablas */
+.full-width-table, .full-width-table-rig, .full-width-table-rigging, .full-width-table-rig-rigging,
+.full-width-table-component-rigging, .full-width-table-types, .full-width-table-sizes {
+    width: 100%; /* La tabla ocupa todo el ancho disponible */
+    border-collapse: collapse; /* Elimina el espacio entre las celdas */
+    background-color: #343940; /* Color de fondo para las celdas de la tabla */
+    text-align: center;
+}
+
+.full-width-table th, .full-width-table td,
+.full-width-table-rig th, .full-width-table-rig td,
+.full-width-table-rigging th, .full-width-table-rigging td,
+.full-width-table-component-rigging th, .full-width-table-component-rigging td,
+.full-width-table-rig-rigging th, .full-width-table-rig-rigging td,
+.full-width-table-types th, .full-width-table-types td, .full-width-table-sizes {
+    color: white; /* Texto blanco para las celdas */
+    padding: 10px; /* Espaciado interno en las celdas */
+    border-bottom: 2px solid white; /* Línea divisoria blanca entre filas */
+    cursor: pointer; /* Cursor en forma de mano para indicar que es clickable */
+}
+
+.full-width-table a, .full-width-table-rig a, .full-width-table-rigging a,
+.full-width-table-component-rigging a, .full-width-table-rig-rigging a,
+.full-width-table-types a, .full-width-table-sizes a {
+    color: white; /* Asegura que los enlaces son blancos */
+    text-decoration: none; /* Elimina el subrayado de los enlaces */
+}
+
+.full-width-table a:hover, .full-width-table-rig a:hover,
+.full-width-table-rigging a:hover, .full-width-table-component-rigging a:hover,
+.full-width-table-rig-rigging a:hover, .full-width-table-types a:hover, .full-width-table-sizes a:hover {
+    text-decoration: underline; /* Agrega subrayado al pasar el mouse para mejorar la interactividad */
+}
+
+/* Estilos específicos para la interacción del mouse en .full-width-table */
+.full-width-table tbody tr:hover {
+    background-color: #575c66; /* Cambia el color según tu preferencia */
+}
+
+/* Sin efecto hover para .full-width-table-rig */
+.full-width-table-rig tbody tr:hover {
+    background-color: #343940; /* Mismo color que el de fondo, no cambia al hacer hover */
+}
+
+.full-width-table-rigging tbody tr:hover {
+    background-color: #343940;
+}
+
+.full-width-table-component-rigging tbody tr:hover {
+    background-color: #343940;
+}
+
+.full-width-table-rig-rigging tbody tr:hover {
+    background-color: #343940;
+}
+
+.full-width-table-types tbody tr:hover {
+    background-color: #343940;
+}
+
+.full-width-table-sizes tbody tr:hover {
+    background-color: #343940;
+}
+
+
+/* Estilos para las pestañas, como ya los tienes */
+.tabs ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
+
+.tabs li {
+    float: left;
+}
+
+.tabs li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.tabs li a:hover {
+    background-color: #575c66;
+}
+
+.header {
+    background-color: #343940; /* Color de fondo del encabezado */
+    height: 70px; /* Altura del encabezado */
+    line-height: 70px; /* Centrado vertical del texto en el encabezado */
+    color: white; /* Color del texto en el encabezado */
+    text-align: center; /* Alineación del texto */
+    font-size: 24px; /* Tamaño del texto */
+}
+
+.header-element {
+    padding: 10px 20px; /* Espaciado interno */
+    text-align: center; /* Alineación del texto */
+}
+
+.modal-dialog {
+    max-width: 50%;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    min-height: calc(100vh - 60px); /* Asegura una altura mínima y resta el margen superior e inferior */
+}
+
+.logout-link {
+    position: absolute;
+    top: 20px; /* Ajusta según sea necesario */
+    right: 20px; /* Ajusta según sea necesario */
+}
+
+.dropdown-menu {
+    z-index: 1050; /* Asegúrate de que el z-index sea alto */
+}
+
+/* Opcional: Si el contenedor principal tiene un z-index alto, ajusta el navbar */
+.navbar {
+    position: relative;
+    z-index: 1000; /* Ajusta según sea necesario */
+}
+
+
+

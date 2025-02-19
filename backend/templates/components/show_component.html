@@ -1,0 +1,326 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <div class="container mt-4" style="color: white;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>{{ component.serial_number }}</h2>
+            <div>
+                {% if component.rigs %}
+                    {% for rig in component.rigs %}
+                        {% if component.component_type.component_type == 'Reserve' %}
+                            <form action="{{ url_for('components.umount_component', component_id=component.id) }}"
+                                  method="post"
+                                  onsubmit="return confirm('Are you sure you want to umount this component?');">
+                                <button type="submit" class="btn btn-danger">Umount</button>
+                            </form>
+                        {% else %}
+                            <!-- Button to trigger the modal -->
+                            <button type="button" class="btn btn-danger" data-toggle="modal"
+                                    data-target="#umountModal_{{ rig.id }}">
+                                Umount
+                            </button>
+                        {% endif %}
+
+                        <!-- Modal for non-Reserve components -->
+                        <div class="modal fade" id="umountModal_{{ rig.id }}" tabindex="-1"
+                             aria-labelledby="umountModalLabel_{{ rig.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="umountModalLabel_{{ rig.id }}">Dismount
+                                            Component</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="umountForm_{{ rig.id }}"
+                                              action="{{ url_for('components.umount_component', component_id=component.id) }}"
+                                              method="post">
+                                            {% if component.component_type.component_type not in ['Reserve'] %}
+                                                <div class="form-group">
+                                                    <label for="current_aad_jumps_{{ rig.id }}" style="color: black;">Current
+                                                        AAD Jumps</label>
+                                                    <input type="number" class="form-control" name="current_aad_jumps"
+                                                           id="current_aad_jumps_{{ rig.id }}"
+                                                           {% if component.component_type.component_type != 'Reserve' %}required{% endif %}>
+                                                </div>
+                                            {% endif %}
+                                            <input type="hidden" name="component_type"
+                                                   value="{{ component.component_type.component_type }}">
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                                        </button>
+                                        <button type="submit" class="btn btn-primary"
+                                                onclick="document.getElementById('umountForm_{{ rig.id }}').submit();">
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <button type="button" class="btn btn-success" data-toggle="modal"
+                            data-target="#mountComponentModal">
+                        Mount Component
+                    </button>
+
+                    <!-- Modal for mounting component -->
+                    <div class="modal fade" id="mountComponentModal" tabindex="-1"
+                         aria-labelledby="mountComponentModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="mountComponentModalLabel">Mount Component</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="mountForm"
+                                          action="{{ url_for('components.mount_component', component_id=component.id) }}"
+                                          method="post">
+                                        <div class="form-group" style="color: black">
+                                            <label for="rig_id">Select Rig</label>
+                                            <select class="form-control" name="rig_id" id="rig_id" required>
+                                                {% for rig in available_rigs %}
+                                                    <option value="{{ rig.id }}">{{ rig.rig_number }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        {% if component.component_type.component_type != 'Reserve' %}
+                                            <div class="form-group" style="color: black">
+                                                <label for="current_aad_jumps">Aad jump record</label>
+                                                <input type="number" class="form-control" name="current_aad_jumps"
+                                                       id="current_aad_jumps">
+                                            </div>
+                                        {% endif %}
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                                            </button>
+                                            <button type="submit" class="btn btn-primary"
+                                                    onclick="document.getElementById('mountForm').submit();">Save
+                                            </button>
+                                        </div>
+                                        <!-- Hidden field to pass the component ID -->
+                                        <input type="hidden" name="component_id" value="{{ component.id }}">
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editComponentModal">Edit
+            </button>
+            <form action="{{ url_for('components.delete_component', id=component.id) }}" method="post"
+                  style="display: inline;">
+                <input type="submit" value="Delete" class="btn btn-danger" onclick="return confirm('Sure?')">
+            </form>
+
+        </div>
+        <table class="table table-bordered" style="color: white;">
+            <tbody>
+            <tr>
+                <th>Serial Number</th>
+                <td>{{ component.serial_number }}</td>
+            </tr>
+            <tr>
+                <th>Modelo</th>
+                <td>{{ component.model | default('') }}</td>
+            </tr>
+            <tr>
+                <th>DOM</th>
+                <td>{{ component.dom.strftime('%Y-%m-%d') if component.dom else '' }}</td>
+            </tr>
+            <tr>
+                <th>Estado</th>
+                <td>{{ component.component_status | default('') }}</td>
+            </tr>
+            <tr>
+                <th>Montedo en</th>
+                <td>
+                    {% if component.rigs %}
+                        {% for rig in component.rigs %}
+                            {{ rig.rig_number }}
+                        {% endfor %}
+
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Jumps</th>
+                <td>{{ component.jumps | default(0) }}</td>
+            </tr>
+            <!-- Agrega más filas según sea necesario para otros atributos del componente -->
+            </tbody>
+        </table>
+
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h3>Registros de Rigging</h3>
+            <!-- Botón para añadir un nuevo registro de rigging -->
+            <button type="button" class="btn btn-success" data-toggle="modal"
+                    data-target="#newComponentRiggingRecordModal">
+                Añadir
+            </button>
+        </div>
+
+        <table class="full-width-table-component-rigging" style="color: white;">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Rigger</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in riggings %}
+                <tr class="clickable-row" data-id="{{ item.id }}">
+                    <td>{{ item.id if item.id else '' }}</td>
+                    <td>{{ item.date if item.date else '' }}</td>
+                    <td>{{ item.rigger if item.rigger else '' }}</td>
+                    <td>{{ item.type_rigging.name if item.type_rigging else '' }}</td>
+                    <td>{{ item.description | default('') }}</td>
+                    <td>
+                        <a href="{{ url_for('rigging.show_rigging', rigging_id=item.id) }}">{{ item.description | default('') }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+    <!-- Modal para editar -->
+    <div class="modal fade" id="editComponentModal" tabindex="-1" role="dialog"
+         aria-labelledby="editComponentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editComponentModalLabel">Editar Componente</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ url_for('components.edit_component', id=component.id) }}" method="post">
+                    Component Type:
+                    <select name="component_type_id" required>
+                        {% for type in component_types %}
+                            <option value="{{ type.id }}" {% if type.id == component.component_type_id %}
+                                    selected {% endif %}>
+                                {{ type.component_type }}
+                            </option>
+                        {% endfor %}
+                    </select><br>
+                    Serial Number: <input type="text" name="serial_number" value="{{ component.serial_number }}"
+                                          required><br>
+                    Date of Manufacture: <input type="date" name="dom" value="{{ component.dom.isoformat() }}"><br>
+                    Size:
+                    <select name="size_id" required>
+                        {% for size in component_sizes %}
+                            <option value="{{ size.id }}" {% if size.id == component.size_id %} selected {% endif %}>
+                                {{ size.size }}
+                            </option>
+                        {% endfor %}
+                    </select><br>
+                    Status:
+                    <select name="status_id" required>
+                        {% for status in component_statuses %}
+                            <option value="{{ status.id }}" {% if status.id == component.status_id %}
+                                    selected {% endif %}>
+                                {{ status.status }}
+                            </option>
+                        {% endfor %}
+                    </select><br>
+                    Model:
+                    <select name="model_id" required>
+                        {% for model in component_models %}
+                            <option value="{{ model.id }}" {% if model.id == component.model_id %} selected {% endif %}>
+                                {{ model.model }}
+                            </option>
+                        {% endfor %}
+                    </select><br>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Registro</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para añadir rigging -->
+    <div class="modal fade" id="addComponentRiggingModal" tabindex="-1" role="dialog"
+         aria-labelledby="addComponentRiggingModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addComponentRiggingModalLabel">Añadir Registro de Rigging</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ url_for('rigging.rigging_add') }}" method="post">
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Nuevo Rigging record -->
+    <div class="modal fade" id="newComponentRiggingRecordModal" tabindex="-1"
+         aria-labelledby="newComponentRiggingRecordModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="{{ url_for('rigging.rigging_add', component_id=component.id) }}" method="post">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="newComponentRiggingRecordModalLabel">Add New Rigging</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="date">Fecha:</label>
+                        <input type="date" name="date" id="date" required><br>
+
+                        <label for="type_rigging">Tipo de Rigging:</label>
+                        <select name="type_rigging" id="type_rigging" required>
+                            {% for type in rigging_types %}
+                                <option value="{{ type.id }}">{{ type.name }}</option>
+                            {% endfor %}
+                        </select><br>
+
+                        <input type="hidden" name="component_id" value="{{ component.id }}">
+
+                        <label for="description">Descripción:</label>
+                        <textarea name="description"
+                                  id="description">{{ rigging.description if rigging else '' }}</textarea>
+                        <br>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Rig</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+
+
+
+
+

@@ -1,0 +1,50 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <table class="full-width-table">
+        <thead class="header">
+        <tr>
+            <th>Serial Number</th>
+            <th>Model</th>
+            {% if not is_aad %}
+                <th>Size</th>{% endif %}
+            <th>Dom</th>
+            <th>Mounted On</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for component in components %}
+            <tr class="clickable-row" data-id="{{ component.id }}">
+                <td>{{ component.serial_number | default('', true) }}</td>
+                <td>{{ component.model | default('', true) }}</td>
+                {% if not is_aad %}
+                    <td>{{ component.sizes.size | default('', true) }}</td>{% endif %}
+                <td>{{ component.dom | default('', true) }}</td>
+                <td>{{ component.rig.rig_number if component.rig else '' }}</td>
+                <td>{{ component.component_status | default('', true) }}</td>
+            </tr>
+
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block scripts %}
+
+    <script src="{{ url_for('static', filename='js/components.js') }}"></script>
+    /*
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('.clickable-row').forEach(row => {
+                row.addEventListener('click', function () {
+                    let componentId = this.getAttribute('data-id');
+                    window.location.href = `/component/show/${componentId}`;
+
+                });
+            });
+        });
+
+     */
+
+
+{% endblock %}

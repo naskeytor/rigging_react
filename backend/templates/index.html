@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+< lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval'">
+
+    <title>Rigging Management</title>
+
+</head>
+
+<div class="navbar">
+    <h1>Rigging Management</h1>
+    <div class="logout-link">
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-link">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Rigging Management</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item"><a class="nav-link dynamic-link" href="/rigs">Rigs</a></li>
+                <li class="nav-item"><a class="nav-link dynamic-link" href="/components/Canopy">Canopies</a></li>
+                <li class="nav-item"><a class="nav-link dynamic-link" href="/components/Container">Containers</a></li>
+                <li class="nav-item"><a class="nav-link dynamic-link" href="/components/Reserve">Reserves</a></li>
+                <li class="nav-item"><a class="nav-link dynamic-link" href="/components/Aad">AAD</a></li>
+                <li class="nav-item"><a class="nav-link dynamic-link" href="/components">Components</a></li>
+                <li class="nav-item"><a class="nav-link dynamic-link" href="/rigging">Rigging</a></li>
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        More
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="/component_types">Component Types</a>
+                        <a class="dropdown-item" href="/sizes">Sizes</a>
+                        <a class="dropdown-item" href="/statuses">Statuses</a>
+                        <a class="dropdown-item" href="/manufacturers">Manufacturers</a>
+                        <a class="dropdown-item" href="/models">Models</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="action-bar">
+        <div class="action-bar-right">
+            {% if request.path == "/rigs" %}
+                <!-- Botón para añadir un nuevo Rig -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newRigModal">New Rig
+                </button>
+            {% elif request.path == "/components" %}
+                <!-- Botón para añadir un nuevo Componente -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newComponentModal">New
+                    Component
+                </button>
+            {% elif request.path == "/rigging" %}
+                <!-- Botón para añadir un nuevo Componente -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newRiggingRecordModal">
+                    New
+                    Rigging Record
+                </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="preloader" style="display: none; text-align: center; padding: 20px;">
+        <img src="{{ url_for('static', filename='images/loader.gif') }}" alt="Loading..." width="50">
+    </div>
+
+    <div id="main-content">
+        {% block content %}
+            <!-- El contenido específico de cada página se insertará aquí -->
+        {% endblock %}
+    </div>
+</div>
+
+
+<!-- Modal Genérico para Nuevo Componente -->
+<div class="modal fade" id="newComponentModal" tabindex="-1" aria-labelledby="newComponentModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ url_for('components.add_component') }}" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addComponentModalLabel">Add</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Contenido del formulario -->
+                    Serial Number: <input type="text" name="serial_number" required><br>
+                    Component Type:
+                    <select name="component_type_id" required>
+                        {% for type in component_types %}
+                            {% if type.component_type != 'Rig' %}
+                                <option value="{{ type.id }}">{{ type.component_type }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select><br>
+
+                    Date of Manufacture: <input type="date" name="dom"><br>
+                    Size:
+                    <select name="size_id" required>
+                        {% for size in component_sizes %}
+                            <option value="{{ size.id }}">{{ size.size }}</option>
+                        {% endfor %}
+                    </select><br>
+                    Status:
+                    <select name="status_id" required>
+                        {% for status in component_statuses %}
+                            <option value="{{ status.id }}">{{ status.status }}</option>
+                        {% endfor %}
+                    </select><br>
+                    Model:
+                    <select name="model_id" required>
+                        {% for model in component_models %}
+                            <option value="{{ model.id }}">{{ model.model }}</option>
+                        {% endfor %}
+                    </select><br>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Registro</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para Nuevo Rig -->
+<div class="modal fade" id="newRigModal" tabindex="-1" aria-labelledby="newRigModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ url_for('rigs.add_rig') }}" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newRigModalLabel">Add New Rig</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <label for="rig_number">Rig Number:</label>
+                    <input type="text" name="rig_number" id="rig_number" required><br>
+
+                    Canopy
+                    <select name="canopy" id="canopy">
+                        <option value="">-- Select Canopy --</option>
+                        {% for canopy in available_canopies %}
+                            <option value="{{ canopy.serial_number }}">{{ canopy.serial_number }}</option>
+                        {% endfor %}
+                    </select><br>
+
+                    Container
+                    <select name="container" id="container">
+                        <option value="">-- Select Container --</option>
+                        {% for container in available_containers %}
+                            <option value="{{ container.serial_number }}">{{ container.serial_number }}</option>
+                        {% endfor %}
+                    </select><br>
+
+                    Reserve
+                    <select name="reserve" id="reserve">
+                        <option value="">-- Select Reserve --</option>
+                        {% for reserve in available_reserves %}
+                            <option value="{{ reserve.serial_number }}">{{ reserve.serial_number }}</option>
+                        {% endfor %}
+                    </select><br>
+
+                    AAD
+                    <select name="aad" id="aad">
+                        <option value="">-- Select Aad --</option>
+                        {% for aad in available_aads %}
+                            <option value="{{ aad.serial_number }}">{{ aad.serial_number }}</option>
+                        {% endfor %}
+                    </select><br>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="openAadJumpsModal()">Save Rig</button>
+                    <!--<button type="submit" class="btn btn-primary">Save Rig</button>-->
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para Current AAD Jumps -->
+<div class="modal fade" id="aadJumpsModal" tabindex="-1" aria-labelledby="aadJumpsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="aadJumpsModalLabel">Current AAD Jumps</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="current_aad_jumps">Current AAD Jumps:</label>
+                <input type="number" name="current_aad_jumps" id="current_aad_jumps" required><br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitForm()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Nuevo Rigging record -->
+<div class="modal fade" id="newRiggingRecordModal" tabindex="-1" aria-labelledby="newRiggingRecordModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ url_for('rigging.rigging_add') }}" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newRiggingRecordModalLabel">Add New Rigging</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <label for="date">Fecha:</label>
+                    <input type="date" name="date" id="date" required><br>
+
+                    <label for="type_rigging">Tipo de Rigging:</label>
+                    <select name="type_rigging" id="type_rigging" required>
+                        {% for type in rigging_types %}
+                            <option value="{{ type.id }}">{{ type.name }}</option>
+                        {% endfor %}
+                    </select><br>
+
+                    <label for="serial_numbers">Seleccionar número de serie:</label>
+
+                    <select id="serial_numbers" name="serial_numbers" required>
+                        <optgroup label="Componentes">
+                            {% for component in components %}
+                                <option value="Component-{{ component.id }}"
+                                        {% if rigging.component_id == component.id %}selected{% endif %}>
+                                    {{ component.serial_number }}
+                                </option>
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="Rigs">
+                            {% for rig in rigs %}
+                                <option value="Rig-{{ rig.id }}" {% if rigging.rig_id == rig.id %}selected{% endif %}>
+                                    {{ rig.rig_number }}
+                                </option>
+                            {% endfor %}
+                        </optgroup>
+                    </select><br>
+
+                    <label for="description">Descripción:</label>
+                    <textarea name="description" id="description">{{ rigging.description }}</textarea>
+                    <br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Rig</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+
+<script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/rigs.js') }}"></script>
+{% endblock %}
+
+
+
+
+/*
+function openAadJumpsModal() {
+$('#newRigModal').modal('hide');
+$('#aadJumpsModal').modal('show');
+}
+
+function submitForm() {
+const currentAadJumps = document.getElementById('current_aad_jumps').value;
+const form = document.getElementById('newRigForm');
+const input = document.createElement('input');
+input.type = 'hidden';
+input.name = 'current_aad_jumps';
+input.value = currentAadJumps;
+form.appendChild(input);
+$('#aadJumpsModal').modal('hide');
+form.submit();
+}
+
+*/
+
+
+/*
+document.addEventListener("DOMContentLoaded", function () {
+// Verificar si la URL actual corresponde a la pestaña "Rigs"
+if (window.location.pathname === '/rigs') {
+// Agregar evento de clic a cada fila de la tabla de rigs
+document.querySelectorAll('.full-width-table-rig tbody tr').forEach(row => {
+row.addEventListener('click', function () {
+// Redirige a la página del rig
+const rigId = row.getAttribute('data-id');
+window.location.href = `/rig/${rigId}`;
+});
+});
+} else if (window.location.pathname.includes('/rigging')) {
+// Agregar evento de clic a cada fila de la tabla de rigging
+document.querySelectorAll('.full-width-table-rigging tbody tr').forEach(row => {
+row.addEventListener('click', function () {
+// Redirige a la página de detalles de rigging
+const riggingId = row.getAttribute('data-id');
+window.location.href = `/rigging/${riggingId}`;
+});
+});
+} else {
+// Agregar evento de clic a cada fila de la tabla de componentes
+document.querySelectorAll('.full-width-table tbody tr').forEach(row => {
+row.addEventListener('click', function () {
+// Redirige a la página del componente
+const componentId = row.getAttribute('data-id');
+window.location.href = `/component/show/${componentId}`;
+});
+});
+}
+});
+
+*/
+
+
+<!-- jQuery y Popper.js (necesarios para Bootstrap) -->
+
+<!-- Bootstrap JS -->
+
+
+/*
+function validateAndSubmitForm(componentId) {
+const currentAadJumpsInput = document.getElementById(`current_aad_jumps-${componentId}`);
+const aadJumpsOnMountInput = document.getElementById(`aad_jumps_on_mount-${componentId}`);
+const errorMessageDiv = document.getElementById(`error-message-${componentId}`);
+
+if (!currentAadJumpsInput || !aadJumpsOnMountInput || !errorMessageDiv) {
+console.error('Element not found!');
+return false;
+}
+
+const currentAadJumps = parseInt(currentAadJumpsInput.value, 10);
+const aadJumpsOnMount = parseInt(aadJumpsOnMountInput.value, 10);
+
+if (isNaN(currentAadJumps) || isNaN(aadJumpsOnMount)) {
+errorMessageDiv.textContent = 'Both Current AAD Jumps and AAD Jumps on Mount must be integers';
+return false; // Impide el envío del formulario si la validación falla
+}
+
+if (currentAadJumps < aadJumpsOnMount) {
+errorMessageDiv.textContent = 'Current AAD Jumps cannot be less than AAD Jumps on Mount';
+return false; // Impide el envío del formulario si la validación falla
+} else {
+return true; // Permite el envío del formulario si la validación pasa
+}
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+$('.modal').on('shown.bs.modal', function (event) {
+const button = $(event.relatedTarget); // Botón que activó el modal
+const componentId = button.data('component-id'); // Extraer información de los atributos data-*
+const modal = $(this);
+
+modal.find('.btn-danger').off('click').on('click', function () {
+const form = document.getElementById(`removeComponentForm-${componentId}`);
+if (validateAndSubmitForm(componentId)) {
+form.submit();
+}
+});
+});
+});
+
+*/
+
+
+/*
+function setupClickableRows() {
+// Asigna el evento clic a las filas de la tabla
+$('.clickable-row-rigs').off('click').on('click', function () {
+const rigId = $(this).data('id');
+if (rigId) {
+window.location.href = `/rig/${rigId}`;
+} else {
+console.error('No se encontró el atributo data-id en la fila');
+}
+});
+}
+
+
+function setupClickableRows() {
+// Asigna el evento clic a las filas de la tabla
+$('.clickable-row').off('click').on('click', function () {
+const id = $(this).data('id');       // ID de la fila
+const type = $(this).data('type');   // Tipo (rig, component, rigging)
+
+if (id && type) {
+// Redirige según el tipo de contenido
+switch (type) {
+case 'rig':
+window.location.href = `/rig/${id}`;
+break;
+case 'component':
+window.location.href = `/component/show/${id}`;
+break;
+case 'rigging':
+window.location.href = `/rigging/${id}`;
+break;
+default:
+console.error(`Tipo desconocido: ${type}`);
+}
+} else {
+console.error('Falta el atributo data-id o data-type en la fila');
+}
+});
+}
+
+
+$(document).ready(function () {
+// Configura el clic para el enlace "Rigs"
+$('#rigs-link').click(function (event) {
+event.preventDefault(); // Evita la recarga de la página
+
+$.ajax({
+url: '/rigs', // Ruta que deseas cargar
+type: 'GET',
+success: function (data) {
+// Extrae y reemplaza solo el bloque principal
+const content = $(data).find('#main-content').html();
+$('#main-content').html(content);
+
+// Actualiza la URL sin recargar la página
+history.pushState(null, '', '/rigs');
+
+// Reasigna los eventos de clic a las filas
+setupClickableRows();
+},
+error: function (xhr, status, error) {
+console.error('Error al cargar /rigs:', error);
+}
+});
+});
+
+// Maneja el botón de "Atrás" y "Adelante" del navegador
+window.addEventListener('popstate', function () {
+$.ajax({
+url: window.location.pathname,
+type: 'GET',
+success: function (data) {
+const content = $(data).find('#main-content').html();
+$('#main-content').html(content);
+
+// Reasigna los eventos de clic a las filas
+setupClickableRows();
+},
+error: function (xhr, status, error) {
+console.error('Error al manejar popstate:', error);
+}
+});
+});
+
+// Configura los clics al cargar la página
+setupClickableRows();
+});
+
+*/
+
+
+</body>
+</html>

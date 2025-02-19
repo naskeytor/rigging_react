@@ -1,0 +1,45 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <table class="full-width-table-rig">
+        <thead class="header">
+        <tr>
+            <th>Rig Number</th>
+            <th>Canopy</th>
+            <th>Container</th>
+            <th>Reserve</th>
+            <th>AAD</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for rig in rigs %}
+            <tr class="clickable-row" data-id="{{ rig.id }}">
+                <td>{{ rig.rig_number | default('', true) }}</td>
+                <td>{{ rig.canopy.serial_number | default('', true) }}</td>
+                <td>{{ rig.container.serial_number | default('', true) }}</td>
+                <td>{{ rig.reserve.serial_number | default('', true) }}</td>
+                <td>{{ rig.aad.serial_number | default('', true) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="{{ url_for('static', filename='js/rigs.js') }}"></script>
+
+/*
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.clickable-row').forEach(row => {
+            row.addEventListener('click', function () {
+                let rigId = this.getAttribute('data-id');
+                window.location.href = `/rig/${rigId}`;
+            });
+        });
+    });
+
+ */
+
+{% endblock %}
