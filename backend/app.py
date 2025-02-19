@@ -45,7 +45,10 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(int(user_id))
+        user = User.query.get(int(user_id))
+        db.session.refresh(user)  # Asegura que los roles se cargan correctamente
+        return user
+
 
     from .blueprints.components.routes import components_bp
     from .blueprints.rigs.routes import rigs_bp

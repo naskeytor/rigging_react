@@ -1,22 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { fetchData } from "./api"; // Asegúrate de que fetchData está en api.js
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./Login";
+
+const AdminDashboard = () => <h2>Admin Dashboard</h2>;
+const RiggerDashboard = () => <h2>Rigger Dashboard</h2>;
+const UserDashboard = () => <h2>User Dashboard</h2>;
 
 const App = () => {
-    const [data, setData] = useState(null);
-
-    useEffect(() => {
-        fetchData()
-            .then(response => setData(response))
-            .catch(error => console.error("Error al conectar con Flask:", error));
-    }, []);
-
     return (
-        <div>
-            <h1>Prueba de conexión React ↔ Flask</h1>
-            {data ? <p>Respuesta del backend: {JSON.stringify(data)}</p> : <p>Cargando...</p>}
-        </div>
+        <Router>
+            <Routes>
+                <Route path="/" element={<Login />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                <Route path="/rigger-dashboard" element={<RiggerDashboard />} />
+                <Route path="/user-dashboard" element={<UserDashboard />} />
+            </Routes>
+        </Router>
     );
 };
 
 export default App;
-
