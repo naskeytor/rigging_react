@@ -1,11 +1,19 @@
-const API_URL = "http://localhost/api";  // Nginx redirige a Flask
+const API_URL = "http://localhost/api";  // Flask via Nginx
 
-export const fetchData = async () => {
-    try {
-        const response = await fetch(`${API_URL}/`);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error("Error al conectar con Flask:", error);
-    }
+export const login = async (username, password) => {
+    const response = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+        credentials: "include",  // Importante para manejar sesiones
+    });
+    return response.json();
+};
+
+export const getUser = async () => {
+    const response = await fetch(`${API_URL}/user`, {
+        method: "GET",
+        credentials: "include",
+    });
+    return response.json();
 };

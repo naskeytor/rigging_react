@@ -44,6 +44,7 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def is_admin(self):
+        print(f"Roles de {self.username}: {[role.name for role in self.roles]}")
         return any(role.name == 'admin' for role in self.roles)
 
     def has_role(self, role_name):
