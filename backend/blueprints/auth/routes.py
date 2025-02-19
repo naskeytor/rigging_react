@@ -7,24 +7,26 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        user = User(username=username, email=email)
-        user.set_password(password)
+    data = request.get_json()
+    username = data.get("username")
+    email = data.get("email")
+    password = data.get("password")
 
-        role = Role.query.filter_by(name='user').first()
-        if not role:
-            role = Role(name='user')
-            db.session.add(role)
-            db.session.commit()
+    if User.query.filter_by(username=username).first():
+        return jsonify({"message": "El usuario ya existe"}), 400
 
-        user.roles.append(role)
-        db.session.add(user)
+    user = User(username=username, email=email)
+    user.set_password(password)
+
+    role = Role.query.filter_by(name="user").first()
+    if not role:
+        role = Role(name="user")
+        db.session.add(role)
         db.session.commit()
-        return redirect(url_for('main.index'))
-    return render_template('register.html')
+
+    user.roles.append(role)
+    db.session.add(user)
+    db.session.commit()
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
