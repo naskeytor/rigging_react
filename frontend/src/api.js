@@ -17,3 +17,12 @@ export const getUser = async () => {
     });
     return response.json();
 };
+
+export const register = async (username, email, password) => {
+    const response = await fetch("http://localhost/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
+    });
+    return response.json();
+};

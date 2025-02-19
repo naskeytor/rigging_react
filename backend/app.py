@@ -14,7 +14,7 @@ def create_app():
     app.config.from_object(DevelopmentConfig)
 
     # Habilitar CORS para permitir peticiones desde React
-    CORS(app)
+    CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 
     # Crear base de datos si no existe
     db_name = app.config['SQLALCHEMY_DATABASE_URI'].rsplit('/', 1)[-1]
