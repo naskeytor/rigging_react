@@ -1,15 +1,20 @@
-# Usa Node.js 18 como base
-FROM node:18
+# Usa una imagen de Node.js oficial
+FROM node:18-alpine
 
-# Establece el directorio de trabajo
-WORKDIR /app
+# Establecer el directorio de trabajo en el contenedor
+WORKDIR /app/frontend
 
-# Copia solo package.json y package-lock.json para instalar dependencias
+# Copiar archivos del proyecto
 COPY package.json package-lock.json ./
+
+# Instalar dependencias
 RUN npm install
 
-# Exponer el puerto 3000
-EXPOSE 3000
+# Copiar el resto del código fuente
+COPY . .
 
-# Ejecutar React en modo desarrollo con hot reload
-CMD ["npm", "start"]
+# Exponer el puerto de Vite
+EXPOSE 5173
+
+# Comando por defecto para iniciar la app
+CMD ["npm", "run", "dev"]
