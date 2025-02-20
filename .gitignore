@@ -1,0 +1,30 @@
+# 📂 Archivos y carpetas de Node.js
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.vscode/
+.DS_Store
+
+# 📂 Archivos de logs y dependencias de Docker
+logs/
+*.log
+*.out
+*.err
+docker-compose.override.yml
+.dockerignore
+
+# 📂 Build de React y Vite
+dist/
+build/
+.cache/
+public/
+
+# 📂 Dependencias de Python y PyCharm
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.env
+.idea/
+
