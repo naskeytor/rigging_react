@@ -7,19 +7,23 @@ from flask_cors import CORS
 auth_bp = Blueprint('auth', __name__)
 CORS(auth_bp)
 
-@auth_bp.route('/register', methods=['GET', 'POST'])
+
+@auth_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
     username = data.get("username")
     email = data.get("email")
     password = data.get("password")
 
+    # Verificar si el usuario ya existe
     if User.query.filter_by(username=username).first():
         return jsonify({"message": "El usuario ya existe"}), 400
 
+    # Crear nuevo usuario
     user = User(username=username, email=email)
     user.set_password(password)
 
+    # Asignar rol por defecto (si no existe, crearlo)
     role = Role.query.filter_by(name="user").first()
     if not role:
         role = Role(name="user")
@@ -29,6 +33,18 @@ def register():
     user.roles.append(role)
     db.session.add(user)
     db.session.commit()
+
+    # Devolver respuesta en formato JSON
+    return jsonify({
+        "message": "Registro exitoso",
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "role": [role.name for role in user.roles]  # Lista de roles del usuario
+        }
+    }), 201  # 201 = Created
+
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -65,6 +81,7 @@ def logout():
     logout_user()
     return redirect(url_for('main.index'))
 
+
 @auth_bp.route('/user', methods=['GET'])
 @login_required
 def get_user():
@@ -80,5 +97,3 @@ def admin_dashboard():
     if not current_user.is_admin():
         return jsonify({"error": "Acceso denegado"}), 403
     return render_template('admin_dashboard.html')
-
-
