@@ -4,17 +4,23 @@ from backend.extensions import db, migrate
 from flask_login import LoginManager
 from backend.models.models import User
 from backend.config import DevelopmentConfig
+
 from backend.context_processors import (inject_rigging_types, inject_rigs, inject_rigging_sizes, inject_manufacturers,
                                 inject_rigging, inject_rigging_components, inject_component_processor)
 import mysql.connector
 from mysql.connector import errorcode
+
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(DevelopmentConfig)
 
     # Habilitar CORS para permitir peticiones desde React
-    CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
+    #CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
+    CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+    from backend.blueprints.auth.routes import auth_bp
+    # Registrar el blueprint bajo "/api"
+    app.register_blueprint(auth_bp, url_prefix="/api")
 
     # Crear base de datos si no existe
     db_name = app.config['SQLALCHEMY_DATABASE_URI'].rsplit('/', 1)[-1]
@@ -61,7 +67,7 @@ def create_app():
     from .blueprints.main.routes import main_bp
     from .blueprints.auth.routes import auth_bp
 
-    app.register_blueprint(auth_bp)
+    #app.register_blueprint(auth_bp)
     app.register_blueprint(components_bp)
     app.register_blueprint(rigs_bp)
     app.register_blueprint(rigging_bp)
