@@ -73,7 +73,7 @@ const Login = () => {
                 </Box>
 
                 <TextField
-                    label='Username' from flask_cors import CORS
+                    label='Username'
                     placeholder='Enter username'
                     fullWidth
                     required
@@ -113,7 +113,7 @@ const Login = () => {
                 </Button>
 
                 <Typography>
-                    <Link href="#">Forgot password</Link>
+                    <Link href="/forgot-password">Forgot password</Link>
                 </Typography>
                 <Typography>Do you have an account?
                     <Link href="/register"> Sign up</Link>

@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
@@ -6,13 +5,21 @@ import Admin from "./pages/Admin";
 import Rigger from "./pages/Rigger";
 import User from "./pages/User";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword"; // 👈 Importa ForgotPassword
 
-const App = () => {
+function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        {/* Ruta para solicitar el enlace de recuperación */}
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
+        {/* Ruta para restablecer la contraseña */}
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         {/* Rutas protegidas */}
         <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
@@ -29,6 +36,6 @@ const App = () => {
       </Routes>
     </Router>
   );
-};
+}
 
 export default App;

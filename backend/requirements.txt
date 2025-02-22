@@ -19,4 +19,7 @@ gunicorn
 flask-cors
 Flask-WTF
 WTForms
+python-dotenv
+Flask-Mail
+
 
