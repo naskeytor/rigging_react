@@ -2,63 +2,47 @@ import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {
     Box,
-    Checkbox,
     Typography,
     Button,
     Paper,
     Avatar,
     TextField,
-    FormControlLabel,
     Link
 } from "@mui/material";
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
-const paperStyle = {padding: 20, height: '70vh', width: 280, margin: '20px auto'};
+const paperStyle = {padding: 20, height: '80vh', width: 280, margin: '20px auto'};
 const avatarStyle = {backgroundColor: '#374249', color: 'white'};
 const btnStyle = {margin: '8px 0', backgroundColor: '#374249'};
 
-const Login = () => {
+const Register = () => {
     const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
     const navigate = useNavigate();
 
-    const handleLogin = async () => {
-        setError(""); // Limpiar errores previos
+    const handleRegister = async () => {
+        setError("");
+        setSuccess("");
+
         try {
-            const response = await fetch("http://127.0.0.1:5000/api/login", {
+            const response = await fetch("http://127.0.0.1:5000/api/register", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({username, password}),
+                body: JSON.stringify({username, email, password}),
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || "Error al iniciar sesión");
+                throw new Error(data.message || "Error en el registro");
             }
 
-            // Extraer el primer rol si `data.role` es una lista
-            const userRole = Array.isArray(data.role) ? data.role[0] : data.role;
+            setSuccess("Registro exitoso. Redirigiendo al login...");
+            setTimeout(() => navigate("/"), 2000); // Redirigir al login después de 2 segundos
 
-            // Guardamos el token y el rol en localStorage
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("role", userRole);
-
-            // Redirigir según el rol
-            switch (userRole) {
-                case "admin":
-                    navigate("/admin");
-                    break;
-                case "rigger":
-                    navigate("/rigger");
-                    break;
-                case "user":
-                    navigate("/user");
-                    break;
-                default:
-                    setError("Rol desconocido");
-            }
         } catch (err) {
             setError(err.message);
         }
@@ -69,7 +53,7 @@ const Login = () => {
             <Paper elevation={10} style={paperStyle}>
                 <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", gap: 2}}>
                     <Avatar style={avatarStyle}><LockOutlinedIcon/></Avatar>
-                    <h2>Sign in</h2>
+                    <Typography variant="h5">Sign Up</Typography>
                 </Box>
 
                 <TextField
@@ -79,6 +63,16 @@ const Login = () => {
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                    sx={{mt: 2}}
+                />
+                <TextField
+                    label='Email'
+                    placeholder='Enter email'
+                    fullWidth
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    sx={{mt: 2}}
                 />
                 <TextField
                     label='Password'
@@ -88,16 +82,17 @@ const Login = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                />
-
-                <FormControlLabel
-                    label="Remember me"
-                    control={<Checkbox name="checked" color="primary" aria-label="primary"/>}
+                    sx={{mt: 2}}
                 />
 
                 {error && (
-                    <Typography color="error" sx={{textAlign: "center", mt: 1}}>
+                    <Typography color="error" sx={{textAlign: "center", mt: 2}}>
                         {error}
+                    </Typography>
+                )}
+                {success && (
+                    <Typography color="success.main" sx={{textAlign: "center", mt: 2}}>
+                        {success}
                     </Typography>
                 )}
 
@@ -107,20 +102,18 @@ const Login = () => {
                     variant="contained"
                     style={btnStyle}
                     fullWidth
-                    onClick={handleLogin}
+                    onClick={handleRegister}
                 >
-                    Sign in
+                    Register
                 </Button>
 
-                <Typography>
-                    <Link href="/forgot-password">Forgot password</Link>
-                </Typography>
-                <Typography>Do you have an account?
-                    <Link href="/register"> Sign up</Link>
+                <Typography sx={{mt: 2}}>
+                    Already have an account?{" "}
+                    <Link href="/">Sign in</Link>
                 </Typography>
             </Paper>
         </Box>
     );
-}
+};
 
-export default Login;
+export default Register;

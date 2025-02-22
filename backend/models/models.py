@@ -36,6 +36,7 @@ class User(UserMixin, db.Model):
     email = db.Column(String(120), unique=True, nullable=False)
     password_hash = db.Column(String(255))
     roles = relationship('Role', secondary=user_roles, backref=db.backref('users', lazy='dynamic'))
+    reset_token = db.Column(db.String(64), unique=True, nullable=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

@@ -1,9 +1,10 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from backend.extensions import db, migrate
+from backend.extensions import db, migrate, mail
 from flask_login import LoginManager
 from backend.models.models import User
 from backend.config import DevelopmentConfig
+
 
 from backend.context_processors import (inject_rigging_types, inject_rigs, inject_rigging_sizes, inject_manufacturers,
                                 inject_rigging, inject_rigging_components, inject_component_processor)
@@ -48,6 +49,7 @@ def create_app():
 
     db.init_app(app)
     migrate.init_app(app, db)
+    mail.init_app(app)
 
     @login_manager.user_loader
     def load_user(user_id):
