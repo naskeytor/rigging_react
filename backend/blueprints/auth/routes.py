@@ -2,8 +2,10 @@ from flask import Blueprint, render_template, redirect, url_for, request, jsonif
 from flask_login import login_user, logout_user, login_required, current_user
 from backend.models.models import User, Role
 from backend.extensions import db
+from flask_cors import CORS
 
 auth_bp = Blueprint('auth', __name__)
+CORS(auth_bp)
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -55,24 +57,6 @@ def login():
 
     print("🔹 Credenciales incorrectas")
     return jsonify({"message": "Usuario o contraseña incorrectos"}), 401
-
-
-    """data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-
-    user = User.query.filter_by(username=username).first()
-
-    if user and user.check_password(password):
-        login_user(user)
-        print(
-            f"🔹 Usuario {user.username} ha iniciado sesión con roles: {[role.name for role in user.roles]}")  # 👈 Forzar impresión
-        return jsonify({
-            "message": "Login exitoso",
-            "role": [role.name for role in user.roles]  # Devuelve todos los roles
-        })
-
-    return jsonify({"message": "Nombre de usuario o contraseña incorrectos"}), 401"""
 
 
 @auth_bp.route('/logout')
