@@ -18,13 +18,16 @@ def register():
     email = data.get("email")
     password = data.get("password")
 
-    # Verificar si el usuario ya existe
+    # Verificar si el username o el email ya existen en la base de datos
     if User.query.filter_by(username=username).first():
-        return jsonify({"message": "El usuario ya existe"}), 400
+        return jsonify({"message": "El nombre de usuario ya está en uso"}), 400
+
+    if User.query.filter_by(email=email).first():
+        return jsonify({"message": "El email ya está registrado"}), 400
 
     # Crear nuevo usuario
     user = User(username=username, email=email)
-    user.set_password(password)
+    user.set_password(password)  # Función que hashea la contraseña
 
     # Asignar rol por defecto (si no existe, crearlo)
     role = Role.query.filter_by(name="user").first()
