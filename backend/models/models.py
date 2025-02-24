@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import Table, Column, Integer, String, ForeignKey, Date, Text
 from sqlalchemy.orm import relationship
 from backend.extensions import db
+import uuid
 
 # Tabla de asociación para la relación muchos a muchos entre User y Role
 user_roles = Table('user_roles', db.Model.metadata,  # Usando la metadata central de db.Model
@@ -37,6 +38,8 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(String(255))
     roles = relationship('Role', secondary=user_roles, backref=db.backref('users', lazy='dynamic'))
     reset_token = db.Column(db.String(64), unique=True, nullable=True)
+    is_verified = db.Column(db.Boolean, default=False)  # Nuevo campo
+    verification_token = db.Column(db.String(100), unique=True, nullable=True)  # Token de verificación
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

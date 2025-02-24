@@ -1,72 +1,58 @@
 import React, { useState } from "react";
-import { TextField, Button, Typography, Box, Paper, IconButton, InputAdornment } from "@mui/material";
+import { useParams, useNavigate } from "react-router-dom";  // 🔹 Capturar el token desde la URL
+import { Box, TextField, Button, Typography, Paper, IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-const Register = ({ setCurrentView }) => {
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
+const ResetPassword = ({setCurrentView}) => {
+    const { token } = useParams();  // 🔹 Capturar el token correctamente
+    const navigate = useNavigate(); // 🔹 Usar useNavigate para la redirección
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+    const [message, setMessage] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         if (password !== confirmPassword) {
             setError("Las contraseñas no coinciden.");
             return;
         }
 
         try {
-            const response = await fetch("http://127.0.0.1:5000/api/register", {
+            const response = await fetch(`http://127.0.0.1:5000/api/reset-password/${token}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, email, password }),
+                body: JSON.stringify({ password }),
             });
 
             const data = await response.json();
 
-            if (!response.ok) {
-                throw new Error(data.message || "Error en el registro.");
+            if (response.ok) {
+                setMessage("¡Contraseña actualizada correctamente!");
+                setTimeout(() => navigate("/"), 3000);  // 🔹 Redirigir sin recargar
+            } else {
+                setError(data.error || "Error al actualizar la contraseña.");
             }
-
-            setMessage("¡Registro exitoso! Redirigiendo...");
-            setTimeout(() => setCurrentView("login"), 3000);
-        } catch (err) {
-            setError(err.message);
+        } catch (error) {
+            setError("Error de conexión con el servidor.");
         }
     };
 
     return (
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-            <Paper elevation={10} sx={{ padding: 4, width: 350, textAlign: "center", borderRadius: 3 }}>
-                <Typography variant="h5" fontWeight="bold">Registro</Typography>
-
+            <Paper sx={{ padding: 4, width: 400, textAlign: "center" }}>
+                <Typography variant="h5" gutterBottom>
+                    Restablecer Contraseña
+                </Typography>
                 {error && <Typography color="error">{error}</Typography>}
                 {message && <Typography color="primary">{message}</Typography>}
-
                 <form onSubmit={handleSubmit}>
                     <TextField
-                        label="Username"
-                        fullWidth
-                        margin="normal"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                    <TextField
-                        label="Email"
-                        fullWidth
-                        margin="normal"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-
-                    {/* 🔹 Campo de contraseña con icono para mostrar/ocultar */}
-                    <TextField
-                        label="Password"
-                        type={showPassword ? "text" : "password"}  // 🔹 Cambia entre "text" y "password"
+                        label="Nueva Contraseña"
+                        type={showPassword ? "text" : "password"}
                         fullWidth
                         margin="normal"
                         value={password}
@@ -82,11 +68,9 @@ const Register = ({ setCurrentView }) => {
                         }}
                         variant="outlined"
                     />
-
-                    {/* 🔹 Campo de confirmación de contraseña con icono */}
                     <TextField
-                        label="Confirm Password"
-                        type={showConfirmPassword ? "text" : "password"}  // 🔹 Cambia entre "text" y "password"
+                        label="Confirmar Contraseña"
+                        type={showConfirmPassword ? "text" : "password"}
                         fullWidth
                         margin="normal"
                         value={confirmPassword}
@@ -102,13 +86,11 @@ const Register = ({ setCurrentView }) => {
                         }}
                         variant="outlined"
                     />
-
-                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-                        Registrarse
+                    <Button variant="contained" color="primary" fullWidth type="submit" sx={{ mt: 2 }}>
+                        Cambiar Contraseña
                     </Button>
 
-                    {/* 🔹 Botón Cancelar */}
-                    <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }} onClick={() => setCurrentView("login")}>
+                    <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }} onClick={() => navigate("/")}>
                         Cancelar
                     </Button>
                 </form>
@@ -117,4 +99,4 @@ const Register = ({ setCurrentView }) => {
     );
 };
 
-export default Register;
+export default ResetPassword;

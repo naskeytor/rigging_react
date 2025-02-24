@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, {useState, useEffect} from "react";
+import {useNavigate} from "react-router-dom";
 import {
     Box,
     Checkbox,
@@ -9,14 +9,13 @@ import {
     Avatar,
     TextField,
     FormControlLabel,
-    Link,
     InputAdornment,
     IconButton
 } from "@mui/material";
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import {Visibility, VisibilityOff} from "@mui/icons-material";
 
-const Login = () => {
+const Login = ({setCurrentView}) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -24,9 +23,6 @@ const Login = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        setUsername("");
-        setPassword("");
-
         return () => {
             setUsername("");
             setPassword("");
@@ -38,8 +34,8 @@ const Login = () => {
         try {
             const response = await fetch("http://127.0.0.1:5000/api/login", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password }),
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({username, password}),
             });
 
             const data = await response.json();
@@ -53,10 +49,17 @@ const Login = () => {
             localStorage.setItem("role", userRole);
 
             switch (userRole) {
-                case "admin": navigate("/admin"); break;
-                case "rigger": navigate("/rigger"); break;
-                case "user": navigate("/user"); break;
-                default: setError("Rol desconocido");
+                case "admin":
+                    navigate("/admin");
+                    break;
+                case "rigger":
+                    navigate("/rigger");
+                    break;
+                case "user":
+                    navigate("/user");
+                    break;
+                default:
+                    setError("Rol desconocido");
             }
         } catch (err) {
             setError(err.message);
@@ -64,85 +67,68 @@ const Login = () => {
     };
 
     return (
-        <Box>
-            <Paper elevation={10} sx={{ padding: 4, height: '70vh', width: 280, margin: '20px auto' }}>
-                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                    <Avatar sx={{ backgroundColor: '#374249', color: 'white' }}>
-                        <LockOutlinedIcon />
-                    </Avatar>
-                    <Typography variant="h5">Sign in</Typography>
-                </Box>
+        <Paper elevation={10} sx={{padding: 4, width: 350, textAlign: "center", borderRadius: 3}}>
+            <Avatar sx={{bgcolor: "primary.main", color: "white", mx: "auto", mb: 2}}>
+                <LockOutlinedIcon/>
+            </Avatar>
+            <Typography variant="h5" fontWeight="bold">Sign in</Typography>
 
-                {/* Espaciado adicional entre "Sign in" y "Username" */}
-                <Box sx={{ mt: 3 }}>
-                    <TextField
-                        label="Username"
-                        placeholder="Enter username"
-                        fullWidth
-                        required
-                        autoComplete="off"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
 
-                    <TextField
-                        label="Password"
-                        placeholder="Enter password"
-                        type={showPassword ? "text" : "password"}
-                        fullWidth
-                        required
-                        autoComplete="new-password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" aria-label="toggle password visibility">
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                        variant="outlined"
-                        sx={{ mt: 2 }} // Espaciado entre los inputs
-                    />
-                </Box>
+            <TextField
+                label="Username"
+                fullWidth
+                margin="normal"
+                autoComplete="off"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+            />
 
-                <FormControlLabel
-                    label="Remember me"
-                    control={<Checkbox name="checked" color="primary" />}
-                    sx={{ mt: 2 }}
-                />
+            <TextField
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                fullWidth
+                margin="normal"
+                autoComplete="off"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                InputProps={{
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                {showPassword ? <VisibilityOff/> : <Visibility/>}
+                            </IconButton>
+                        </InputAdornment>
+                    ),
+                }}
+            />
 
-                {error && (
-                    <Typography color="error" sx={{ textAlign: "center", mt: 1 }}>
-                        {error}
-                    </Typography>
-                )}
+            <FormControlLabel
+                control={<Checkbox color="primary"/>}
+                label="Remember me"
+                sx={{mt: 1}}
+            />
 
-                {/* Espaciado adicional entre el botón "Sign in" y "Forgot password" */}
-                <Button
-                    type="submit"
-                    color="primary"
-                    variant="contained"
-                    sx={{ mt: 3, backgroundColor: '#374249' }}
-                    fullWidth
-                    onClick={handleLogin}
-                >
-                    Sign in
-                </Button>
+            {error && <Typography color="error" sx={{textAlign: "center", mt: 1}}>{error}</Typography>}
 
-                {/* Espaciado entre el botón y los enlaces */}
-                <Typography sx={{ mt: 2 }}>
-                    <Link href="/forgot-password">Forgot password</Link>
-                </Typography>
+            <Button
+                type="submit"
+                variant="contained"
+                sx={{mt: 3, bgcolor: "primary.main", fontWeight: "bold"}}
+                fullWidth
+                onClick={handleLogin}
+            >
+                Sign in
+            </Button>
 
-                <Typography>
-                    Do you have an account?
-                    <Link href="/register"> Sign up</Link>
-                </Typography>
-            </Paper>
-        </Box>
+            <Button fullWidth sx={{mt: 2, textTransform: "none"}} onClick={() => setCurrentView("forgotPassword")}>
+                Forgot password?
+            </Button>
+
+            <Typography sx={{mt: 2}}>
+                Don't have an account?{" "}
+                <Button sx={{textTransform: "none"}} onClick={() => setCurrentView("register")}>Sign up</Button>
+            </Typography>
+        </Paper>
     );
 };
 
