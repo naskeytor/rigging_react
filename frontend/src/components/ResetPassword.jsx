@@ -1,28 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";  // 🔹 Capturar el token desde la URL
 import { Box, TextField, Button, Typography, Paper, IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-const ResetPassword = () => {
-    const { token } = useParams();
-    const navigate = useNavigate();
+const ResetPassword = ({setCurrentView}) => {
+    const { token } = useParams();  // 🔹 Capturar el token correctamente
+    const navigate = useNavigate(); // 🔹 Usar useNavigate para la redirección
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
-
-    // ⬇️ Limpiar contraseñas cuando se monta y desmonta el componente
-    useEffect(() => {
-        setPassword("");
-        setConfirmPassword("");
-
-        return () => {
-            setPassword("");
-            setConfirmPassword("");
-        };
-    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -43,7 +32,7 @@ const ResetPassword = () => {
 
             if (response.ok) {
                 setMessage("¡Contraseña actualizada correctamente!");
-                setTimeout(() => navigate("/"), 3000);
+                setTimeout(() => navigate("/"), 3000);  // 🔹 Redirigir sin recargar
             } else {
                 setError(data.error || "Error al actualizar la contraseña.");
             }
@@ -66,13 +55,12 @@ const ResetPassword = () => {
                         type={showPassword ? "text" : "password"}
                         fullWidth
                         margin="normal"
-                        autoComplete="new-password" // 🔹 Evita autocompletado
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" aria-label="toggle password visibility">
+                                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                                         {showPassword ? <VisibilityOff /> : <Visibility />}
                                     </IconButton>
                                 </InputAdornment>
@@ -85,13 +73,12 @@ const ResetPassword = () => {
                         type={showConfirmPassword ? "text" : "password"}
                         fullWidth
                         margin="normal"
-                        autoComplete="new-password" // 🔹 Evita autocompletado
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" aria-label="toggle confirm password visibility">
+                                    <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
                                         {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                                     </IconButton>
                                 </InputAdornment>
@@ -99,8 +86,12 @@ const ResetPassword = () => {
                         }}
                         variant="outlined"
                     />
-                    <Button variant="contained" color="primary" fullWidth type="submit" sx={{ marginTop: 2 }}>
+                    <Button variant="contained" color="primary" fullWidth type="submit" sx={{ mt: 2 }}>
                         Cambiar Contraseña
+                    </Button>
+
+                    <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }} onClick={() => navigate("/")}>
+                        Cancelar
                     </Button>
                 </form>
             </Paper>

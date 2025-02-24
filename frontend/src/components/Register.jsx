@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import { TextField, Button, Typography, Box, Paper } from "@mui/material";
+import { TextField, Button, Typography, Box, Paper, IconButton, InputAdornment } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const Register = ({ setCurrentView }) => {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
 
@@ -59,31 +62,56 @@ const Register = ({ setCurrentView }) => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
+
+                    {/* 🔹 Campo de contraseña con icono para mostrar/ocultar */}
                     <TextField
                         label="Password"
-                        type="password"
+                        type={showPassword ? "text" : "password"}  // 🔹 Cambia entre "text" y "password"
                         fullWidth
                         margin="normal"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
+                        variant="outlined"
                     />
+
+                    {/* 🔹 Campo de confirmación de contraseña con icono */}
                     <TextField
                         label="Confirm Password"
-                        type="password"
+                        type={showConfirmPassword ? "text" : "password"}  // 🔹 Cambia entre "text" y "password"
                         fullWidth
                         margin="normal"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
+                                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
+                        variant="outlined"
                     />
 
                     <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
                         Registrarse
                     </Button>
-                </form>
 
-                <Button fullWidth sx={{ mt: 2, textTransform: "none" }} onClick={() => setCurrentView("login")}>
-                    Ya tengo una cuenta, iniciar sesión
-                </Button>
+                    {/* 🔹 Botón Cancelar */}
+                    <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }} onClick={() => setCurrentView("login")}>
+                        Cancelar
+                    </Button>
+                </form>
             </Paper>
         </Box>
     );

@@ -15,7 +15,7 @@ const AuthPage = () => {
                 {currentView === "login" && <Login setCurrentView={setCurrentView} />}
                 {currentView === "register" && <Register setCurrentView={setCurrentView} />}
                 {currentView === "forgotPassword" && <ForgotPassword setCurrentView={setCurrentView} />}
-                {currentView === "resetPassword" && <ResetPassword token={resetToken} setCurrentView={setCurrentView} />}
+                {currentView === "resetPassword" && <ResetPassword setCurrentView={setCurrentView} token={token} />}
 
         </Box>
     );

@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {Box, TextField, Button, Typography, Paper} from "@mui/material";
 
-const ForgotPassword = () => {
+const ForgotPassword = ({setCurrentView}) => {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
@@ -51,6 +51,11 @@ const ForgotPassword = () => {
                     <Button variant="contained" color="primary" fullWidth type="submit">
                         Enviar Enlace
                     </Button>
+                    <Button variant="contained" color="primary" fullWidth sx={{mt: 2}}
+                            onClick={() => setCurrentView("login")}>
+                        Cancelar
+                    </Button>
+
                 </form>
             </Paper>
         </Box>

@@ -8,8 +8,8 @@ import Admin from "./pages/Admin";
 import Rigger from "./pages/Rigger";
 import User from "./pages/User";
 import ProtectedRoute from "./routes/ProtectedRoute";
-import ResetPassword from "./pages/ResetPassword";
-import ForgotPassword from "./pages/ForgotPassword"; // 👈 Importa ForgotPassword
+import ResetPassword from "./components/ResetPassword";
+import ForgotPassword from "./components/ForgotPassword"; // 👈 Importa ForgotPassword
 import theme from "./theme";
 
 
