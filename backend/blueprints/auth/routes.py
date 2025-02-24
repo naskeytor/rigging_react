@@ -5,6 +5,8 @@ from backend.extensions import db, mail
 from flask_cors import CORS
 import secrets
 from flask_mail import Mail, Message  # Necesitas configurar Flask-Mail
+import uuid
+
 
 
 auth_bp = Blueprint('auth', __name__)
@@ -52,6 +54,21 @@ def register():
     }), 201  # 201 = Created
 
 
+
+@auth_bp.route('/verify-email/<token>', methods=['GET'])
+def verify_email(token):
+    user = User.query.filter_by(verification_token=token).first()
+
+    if not user:
+        return jsonify({"message": "Token inválido o usuario no encontrado"}), 400
+
+    user.is_verified = True
+    user.verification_token = None  # Se borra el token después de verificar
+    db.session.commit()
+
+    return jsonify({"message": "Cuenta verificada correctamente. Ahora puedes iniciar sesión."}), 200
+
+
 @auth_bp.route('/login', methods=['POST'])
 def login():
     print("🔹 Entrando en la función login()")  # 👈 Verificar si Flask entra aquí
@@ -79,6 +96,7 @@ def login():
 
     print("🔹 Credenciales incorrectas")
     return jsonify({"message": "Usuario o contraseña incorrectos"}), 401
+
 
 
 @auth_bp.route('/forgot-password', methods=['POST'])
