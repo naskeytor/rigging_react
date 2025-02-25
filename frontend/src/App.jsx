@@ -4,12 +4,15 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Register from "./components/Register";
 import AuthPage from "./pages/AuthPage";
-import Admin from "./pages/Admin";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
+import RiggerDashboard from "./pages/RiggerDashboard.jsx";
+import UserDashboard from "./pages/UserDashboard.jsx";
 import Rigger from "./pages/Rigger";
 import User from "./pages/User";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import ResetPassword from "./components/ResetPassword";
 import ForgotPassword from "./components/ForgotPassword"; // 👈 Importa ForgotPassword
+
 import theme from "./theme";
 
 
@@ -30,15 +33,15 @@ function App() {
 
                     {/* Rutas protegidas */}
                     <Route element={<ProtectedRoute allowedRoles={["admin"]}/>}>
-                        <Route path="/admin" element={<Admin/>}/>
+                        <Route path="/admin" element={<AdminDashboard/>}/>
                     </Route>
 
                     <Route element={<ProtectedRoute allowedRoles={["rigger"]}/>}>
-                        <Route path="/rigger" element={<Rigger/>}/>
+                        <Route path="/rigger" element={<RiggerDashboard/>}/>
                     </Route>
 
                     <Route element={<ProtectedRoute allowedRoles={["user"]}/>}>
-                        <Route path="/user" element={<User/>}/>
+                        <Route path="/user" element={<UserDashboard/>}/>
                     </Route>
                 </Routes>
             </Router>
