@@ -7,6 +7,7 @@ from backend.config import DevelopmentConfig
 
 
 
+
 from backend.context_processors import (inject_rigging_types, inject_rigs, inject_rigging_sizes, inject_manufacturers,
                                 inject_rigging, inject_rigging_components, inject_component_processor)
 import mysql.connector
@@ -17,16 +18,27 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(DevelopmentConfig)
 
+    from backend.blueprints.auth.routes import auth_bp
+    app.register_blueprint(auth_bp, url_prefix="/api")
+
+    app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+    app.config['SESSION_COOKIE_SECURE'] = False  # ⚠ Si usas HTTPS, cámbialo a True
+
+    app.config['REMEMBER_COOKIE_SAMESITE'] = 'None'
+    app.config['REMEMBER_COOKIE_SECURE'] = False  # ⚠ Cambia a True si estás en producción con HTTPS
+
     # Habilitar CORS para permitir peticiones desde React
     #CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
     CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
-    from backend.blueprints.auth.routes import auth_bp
+
+
     # Registrar el blueprint bajo "/api"
-    app.register_blueprint(auth_bp, url_prefix="/api")
+
+
 
     # Crear base de datos si no existe
     db_name = app.config['SQLALCHEMY_DATABASE_URI'].rsplit('/', 1)[-1]
-    db_uri = app.config['SQLALCHEMY_DATABASE_URI'].rsplit('/', 1)[0] + "/mysql"
+    #db_uri = app.config['SQLALCHEMY_DATABASE_URI'].rsplit('/', 1)[0] + "/mysql"
     try:
         cnx = mysql.connector.connect(user='root', password='3664atanas', host='db')  # Cambiado de 'localhost' a 'db'
         cursor = cnx.cursor()

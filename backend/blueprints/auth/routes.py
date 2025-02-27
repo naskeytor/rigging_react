@@ -2,12 +2,10 @@ from flask import Blueprint, render_template, redirect, url_for, request, jsonif
 from flask_login import login_user, logout_user, login_required, current_user
 from backend.models.models import User, Role
 from backend.extensions import db, mail
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import secrets
 from flask_mail import Mail, Message  # Necesitas configurar Flask-Mail
 import uuid
-
-
 
 auth_bp = Blueprint('auth', __name__)
 CORS(auth_bp)
@@ -54,7 +52,6 @@ def register():
     }), 201  # 201 = Created
 
 
-
 @auth_bp.route('/verify-email/<token>', methods=['GET'])
 def verify_email(token):
     user = User.query.filter_by(verification_token=token).first()
@@ -70,6 +67,7 @@ def verify_email(token):
 
 
 @auth_bp.route('/login', methods=['POST'])
+@cross_origin(origins="http://127.0.0.1:5173", supports_credentials=True)
 def login():
     print("🔹 Entrando en la función login()")  # 👈 Verificar si Flask entra aquí
     data = request.get_json()
@@ -96,7 +94,6 @@ def login():
 
     print("🔹 Credenciales incorrectas")
     return jsonify({"message": "Usuario o contraseña incorrectos"}), 401
-
 
 
 @auth_bp.route('/forgot-password', methods=['POST'])
@@ -153,7 +150,6 @@ def reset_password(token):
     return jsonify({"message": "Contraseña actualizada correctamente"}), 200
 
 
-
 @auth_bp.route('/logout')
 @login_required
 def logout():
@@ -168,6 +164,29 @@ def get_user():
         "username": current_user.username,
         "roles": [role.name for role in current_user.roles]
     })
+
+
+@auth_bp.route("/users", methods=["GET"])
+@cross_origin(origins="http://127.0.0.1:5173", supports_credentials=True)  # Habilitar CORS con credenciales
+@login_required
+def get_users():
+    # En lugar de redirigir, devolvemos un error JSON si el usuario no está autenticado
+    if not current_user.is_authenticated:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    users = User.query.all()
+    users_data = [
+        {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "roles": [role.name for role in user.roles],
+            "is_verified": user.is_verified
+        }
+        for user in users
+    ]
+
+    return jsonify(users_data), 200
 
 
 @auth_bp.route('/admin')
