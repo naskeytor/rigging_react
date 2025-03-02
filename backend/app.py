@@ -15,11 +15,11 @@ from mysql.connector import errorcode
 
 def create_app():
     app = Flask(__name__)
+    app.secret_key = '3664atanas'
     app.config.from_object(DevelopmentConfig)
 
-    # Habilitar CORS para permitir peticiones desde React
-    #CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
-    CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
     from backend.blueprints.auth.routes import auth_bp
     # Registrar el blueprint bajo "/api"
     app.register_blueprint(auth_bp, url_prefix="/api")

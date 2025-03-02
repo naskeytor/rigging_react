@@ -2,15 +2,13 @@ from flask import Blueprint, render_template, redirect, url_for, request, jsonif
 from flask_login import login_user, logout_user, login_required, current_user
 from backend.models.models import User, Role
 from backend.extensions import db, mail
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import secrets
 from flask_mail import Mail, Message  # Necesitas configurar Flask-Mail
 import uuid
 
-
-
 auth_bp = Blueprint('auth', __name__)
-CORS(auth_bp)
+CORS(auth_bp, supports_credentials=True, origins=["http://127.0.0.1:5173"])
 
 
 @auth_bp.route('/register', methods=['POST'])
@@ -54,7 +52,6 @@ def register():
     }), 201  # 201 = Created
 
 
-
 @auth_bp.route('/verify-email/<token>', methods=['GET'])
 def verify_email(token):
     user = User.query.filter_by(verification_token=token).first()
@@ -69,10 +66,15 @@ def verify_email(token):
     return jsonify({"message": "Cuenta verificada correctamente. Ahora puedes iniciar sesión."}), 200
 
 
-@auth_bp.route('/login', methods=['POST'])
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     print("🔹 Entrando en la función login()")  # 👈 Verificar si Flask entra aquí
     data = request.get_json()
+
+    if not data or not data.get('username') or not data.get('password'):
+        return jsonify({"message": "Faltan campos requeridos"}), 400  # Error 400 Bad Request
+
+
     username = data.get('username')
     password = data.get('password')
     print(f"🔹 Datos recibidos - Usuario: {username}, Password: {password}")
@@ -96,7 +98,6 @@ def login():
 
     print("🔹 Credenciales incorrectas")
     return jsonify({"message": "Usuario o contraseña incorrectos"}), 401
-
 
 
 @auth_bp.route('/forgot-password', methods=['POST'])
@@ -153,7 +154,6 @@ def reset_password(token):
     return jsonify({"message": "Contraseña actualizada correctamente"}), 200
 
 
-
 @auth_bp.route('/logout')
 @login_required
 def logout():
@@ -176,3 +176,24 @@ def admin_dashboard():
     if not current_user.is_admin():
         return jsonify({"error": "Acceso denegado"}), 403
     return render_template('admin_dashboard.html')
+
+
+@auth_bp.route("/users", methods=["GET"])
+@cross_origin(origins=["http://127.0.0.1:5173", "http://localhost:5173"]
+    , supports_credentials=True)
+#@login_required
+def get_users():
+    print(f"Usuario autenticado: {current_user}")
+
+    users = User.query.all()
+
+    users_data = [
+        {
+            "id": user.id,
+            "name": user.username,  # Usamos "name" en vez de "username" para que coincida con el frontend
+            "role": [role.name for role in user.roles]  # Convertimos roles a string
+        }
+        for user in users
+    ]
+
+    return jsonify(users_data), 200
