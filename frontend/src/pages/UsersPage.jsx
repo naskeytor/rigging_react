@@ -13,7 +13,6 @@ const UsersPage = () => {
         {field: "username", headerName: "Nombre de Usuario", width: 200},
         {field: "email", headerName: "Email", width: 250},
         {field: "roles", headerName: "Roles", width: 200},
-        {field: "is_verified", headerName: "Verificado", width: 150, type: "boolean"},
     ];
 
     useEffect(() => {

@@ -23,14 +23,19 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         axios
-            .get("http://127.0.0.1:5000/api/users", {withCredentials: true})  // ⬅️ Habilita cookies de sesión
+            .get("http://127.0.0.1:5000/api/users", {withCredentials: true})  // ⬅️ Enviar cookies de sesión
             .then((response) => {
-                console.log("Usuarios recibidos:", response.data);
-                setUsers(response.data);
+                const formattedUsers = response.data.map((user) => ({
+                    ...user,
+                    role: user.role.join(", "),  // ⬅️ Convertir lista de roles a string
+                }));
+                console.log("✅ Usuarios formateados:", formattedUsers);
+                setUsers(formattedUsers);
                 setLoading(false);
             })
+
             .catch((error) => {
-                console.error("Error al obtener los usuarios:", error);
+                console.error("❌ Error al obtener los usuarios:", error.response ? error.response.data : error.message);
                 setLoading(false);
             });
     }, []);

@@ -168,7 +168,7 @@ def get_user():
 
 @auth_bp.route("/users", methods=["GET"])
 @cross_origin(origins="http://127.0.0.1:5173", supports_credentials=True)  # Habilitar CORS con credenciales
-@login_required
+#login_required
 def get_users():
     # En lugar de redirigir, devolvemos un error JSON si el usuario no está autenticado
     if not current_user.is_authenticated:
@@ -181,7 +181,6 @@ def get_users():
             "username": user.username,
             "email": user.email,
             "roles": [role.name for role in user.roles],
-            "is_verified": user.is_verified
         }
         for user in users
     ]
