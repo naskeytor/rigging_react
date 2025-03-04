@@ -1,25 +1,26 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+from flask_sqlalchemy.session import Session
 from backend.extensions import db, migrate, mail
 from flask_login import LoginManager
 from backend.models.models import User
 from backend.config import DevelopmentConfig
 
-
-
 from backend.context_processors import (inject_rigging_types, inject_rigs, inject_rigging_sizes, inject_manufacturers,
-                                inject_rigging, inject_rigging_components, inject_component_processor)
+                                        inject_rigging, inject_rigging_components, inject_component_processor)
 import mysql.connector
 from mysql.connector import errorcode
+
 
 
 def create_app():
     app = Flask(__name__)
     app.secret_key = '3664atanas'
     app.config.from_object(DevelopmentConfig)
+    Session(app)
 
-
-    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+    CORS(app, resources={r"/api/*": {"origins": ["https://localhost:5173", "https://127.0.0.1:5173"]
+                                 }}, supports_credentials=True)
     from backend.blueprints.auth.routes import auth_bp
     # Registrar el blueprint bajo "/api"
     app.register_blueprint(auth_bp, url_prefix="/api")
@@ -46,7 +47,8 @@ def create_app():
 
     login_manager = LoginManager()
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'  # Redirige a la vista de login si no está autenticado
+    login_manager.login_message = None  # ⬅️ Desactiva el mensaje de login
+    login_manager.login_view = None  # ⬅️ Evita redirecciones automáticas
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -57,7 +59,6 @@ def create_app():
         user = User.query.get(int(user_id))
         db.session.refresh(user)  # Asegura que los roles se cargan correctamente
         return user
-
 
     from backend.blueprints.components.routes import components_bp
     from backend.blueprints.rigs.routes import rigs_bp
@@ -70,7 +71,7 @@ def create_app():
     from backend.blueprints.main.routes import main_bp
     from backend.blueprints.auth.routes import auth_bp
 
-    #app.register_blueprint(auth_bp)
+    # app.register_blueprint(auth_bp)
     app.register_blueprint(components_bp)
     app.register_blueprint(rigs_bp)
     app.register_blueprint(rigging_bp)
@@ -95,6 +96,3 @@ def create_app():
 
     return app
 
-if __name__ == '__main__':
-    app = create_app()
-    app.run(host="0.0.0.0", port=5000, debug=True)

@@ -8,7 +8,7 @@ import {Box} from "@mui/material";
 const columns = [
     {field: "id", headerName: "ID", width: 100},
     {field: "username", headerName: "Nombre", width: 200},
-    {field: "role", headerName: "Rol", width: 200},
+    {field: "roles", headerName: "Rol", width: 200, },
 ];
 
 const adminMenuItems = [
@@ -22,22 +22,23 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios
-            .get("http://127.0.0.1:5000/api/users", {withCredentials: true})  // ⬅️ Enviar cookies de sesión
+        axios.get("http://127.0.0.1:5000/api/users", {withCredentials: true})
             .then((response) => {
-                const formattedUsers = response.data.map((user) => ({
-                    ...user,
-                    role: user.role.join(", "),  // ⬅️ Convertir lista de roles a string
-                }));
-                console.log("✅ Usuarios formateados:", formattedUsers);
-                setUsers(formattedUsers);
+                console.log("✅ Usuarios recibidos:", response.data);
+                setUsers(response.data);
                 setLoading(false);
             })
-
             .catch((error) => {
-                console.error("❌ Error al obtener los usuarios:", error.response ? error.response.data : error.message);
+                console.error("❌ Error al obtener usuarios:", error);
+                if (error.response) {
+                    console.error("📌 Código de estado:", error.response.status);
+                    console.error("📌 Respuesta del servidor:", error.response.data);
+                } else {
+                    console.error("📌 Error sin respuesta del servidor. Verifica si el backend está corriendo.");
+                }
                 setLoading(false);
             });
+
     }, []);
 
     return (

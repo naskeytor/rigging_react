@@ -36,6 +36,7 @@ const Login = ({setCurrentView}) => {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({username, password}),
+                credentials: "include"  // ⬅️ OBLIGATORIO para que el navegador envíe y reciba la cookie
             });
 
             const data = await response.json();
@@ -65,6 +66,7 @@ const Login = ({setCurrentView}) => {
             setError(err.message);
         }
     };
+
 
     return (
         <Paper elevation={10} sx={{padding: 4, width: 350, textAlign: "center", borderRadius: 3}}>

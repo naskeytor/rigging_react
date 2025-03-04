@@ -16,8 +16,8 @@ services:
     networks:
       rigging_network:
         ipv4_address: 172.25.0.3
-    healthcheck:  # 🔴 Espera a que MySQL esté listo antes de que el backend intente conectarse
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+    healthcheck: # 🔴 Espera a que MySQL esté listo antes de que el backend intente conectarse
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
       retries: 5
       timeout: 5s
@@ -70,23 +70,26 @@ services:
         ipv4_address: 172.25.0.6
     volumes:
       - ./frontend:/app/frontend
+      - ./nginx/certs:/app/certs  # Montar certificados en frontend
     working_dir: /app/frontend
-    command: ["npm", "run", "dev", "--", "--host"]
-
+    command: [ "npm", "run", "dev", "--", "--host" ]
 
   nginx:
     image: nginx:latest
     restart: always
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/certs:/etc/nginx/certs  # Montar certificados en Nginx
     ports:
       - "80:80"
+      - "443:443"  # Exponer HTTPS
     networks:
       rigging_network:
         ipv4_address: 172.25.0.7
     depends_on:
       - backend
       - frontend
+
 
 networks:
   rigging_network:
