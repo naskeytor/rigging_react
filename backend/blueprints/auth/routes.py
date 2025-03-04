@@ -1,13 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, request, jsonify, session
 from flask_login import login_user, logout_user, login_required, current_user
 from backend.models.models import User, Role
 from backend.extensions import db, mail
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import secrets
 from flask_mail import Mail, Message  # Necesitas configurar Flask-Mail
 import uuid
-
-
 
 auth_bp = Blueprint('auth', __name__)
 CORS(auth_bp)
@@ -54,6 +52,10 @@ def register():
     }), 201  # 201 = Created
 
 
+@auth_bp.before_request
+def make_session_permanent():
+    session.permanent = True
+
 
 @auth_bp.route('/verify-email/<token>', methods=['GET'])
 def verify_email(token):
@@ -70,33 +72,22 @@ def verify_email(token):
 
 
 @auth_bp.route('/login', methods=['POST'])
+@cross_origin(origins="https://127.0.0.1:5173", supports_credentials=True)
 def login():
-    print("🔹 Entrando en la función login()")  # 👈 Verificar si Flask entra aquí
+    from flask import session
     data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-    print(f"🔹 Datos recibidos - Usuario: {username}, Password: {password}")
+    username = data.get("username")
+    password = data.get("password")
 
     user = User.query.filter_by(username=username).first()
-    if user:
-        print(f"🔹 Usuario encontrado en la base de datos: {user.username}")
-    else:
-        print("🔹 Usuario no encontrado")
-
     if user and user.check_password(password):
-        db.session.refresh(user)  # Asegurar que los roles se cargan correctamente
-        login_user(user)
-        roles = [role.name for role in user.roles]
-        print(
-            f"🔹 Usuario {user.username} ha iniciado sesión con roles: {[role.name for role in user.roles]}")  # 👈 Forzar impresión
-        return jsonify({
-            "message": "Login exitoso",
-            "role": roles  # Devuelve lista de roles
-        })
+        login_user(user, remember=True)
+        session.permanent = True  # ⬅️ Esto mantiene la sesión activa
+        session["user_id"] = user.id  # ⬅️ Almacenar el ID en la sesión
+        print(f"🔹 Sesión iniciada para {user.username}")
+        return jsonify({"message": "Login exitoso", "role": [role.name for role in user.roles]}), 200
 
-    print("🔹 Credenciales incorrectas")
-    return jsonify({"message": "Usuario o contraseña incorrectos"}), 401
-
+    return jsonify({"error": "Usuario o contraseña incorrectos"}), 401
 
 
 @auth_bp.route('/forgot-password', methods=['POST'])
@@ -153,7 +144,6 @@ def reset_password(token):
     return jsonify({"message": "Contraseña actualizada correctamente"}), 200
 
 
-
 @auth_bp.route('/logout')
 @login_required
 def logout():
@@ -162,6 +152,7 @@ def logout():
 
 
 @auth_bp.route('/user', methods=['GET'])
+@cross_origin(origins="https://127.0.0.1:5173", supports_credentials=True)
 @login_required
 def get_user():
     return jsonify({
@@ -170,9 +161,44 @@ def get_user():
     })
 
 
+@auth_bp.route("/users", methods=["GET"])
+@cross_origin(origins="https://127.0.0.1:5173", supports_credentials=True)
+@login_required
+def get_users():
+    from flask import session
+    print(f"🔹 Verificando sesión en /api/users")
+    print(f"🔹 current_user: {current_user}")
+    print(f"🔹 session: {session.items()}")
+    print(f"🔹 current_user.is_authenticated: {current_user.is_authenticated}")
+
+    if not current_user.is_authenticated:
+        print("❌ No autenticado en /api/users")
+        return jsonify({"error": "Unauthorized"}), 401
+
+    users = User.query.all()
+    users_data = [
+        {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "roles": [role.name for role in user.roles],
+        }
+        for user in users
+    ]
+
+    print("✅ Usuarios enviados con éxito")
+    return jsonify(users_data), 200
+
+
 @auth_bp.route('/admin')
 @login_required
 def admin_dashboard():
     if not current_user.is_admin():
         return jsonify({"error": "Acceso denegado"}), 403
     return render_template('admin_dashboard.html')
+
+@auth_bp.route("/debug-session")
+def debug_session():
+    print(request.cookies)  # Imprime las cookies en la consola
+    return jsonify({"session": request.cookies.get("session")})
+

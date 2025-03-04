@@ -10,7 +10,8 @@ import {
     Tooltip,
     Toolbar,
     Typography,
-    AppBar
+    AppBar,
+    MenuItem
 } from "@mui/material";
 import {Menu, ChevronLeft, ChevronRight, ExitToApp} from "@mui/icons-material";
 import {styled, useTheme} from "@mui/system";
