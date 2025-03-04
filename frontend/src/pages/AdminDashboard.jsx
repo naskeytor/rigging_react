@@ -17,8 +17,17 @@ const AdminDashboard = () => {
     return (
         <Box display="flex" height="100vh">
             <SidebarComponent menuItems={adminMenuItems} />
-            <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" flexGrow={1} p={3}>
 
+            {/* 🔴 Este contenedor ahora respeta el ancho del sidebar */}
+            <Box component="main"
+                 sx={{
+                     flexGrow: 1,
+                     p: 3,
+                     marginLeft: { xs: "60px", sm: "240px" }, // 🔴 Se ajusta al ancho del sidebar
+                     transition: "margin 0.3s ease-in-out", // 🔴 Suaviza el cambio cuando el sidebar se expande
+                 }}
+            >
+                
             </Box>
         </Box>
     );
