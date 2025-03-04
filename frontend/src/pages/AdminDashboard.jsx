@@ -18,7 +18,7 @@ const AdminDashboard = () => {
         <Box display="flex" height="100vh">
             <SidebarComponent menuItems={adminMenuItems} />
             <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" flexGrow={1} p={3}>
-                
+
             </Box>
         </Box>
     );
