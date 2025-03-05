@@ -1,4 +1,4 @@
-import Sidebar from "../components/Sidebar";
+import SidebarComponent from "../components/Sidebar";
 import { Outlet } from "react-router-dom";
 import { Dashboard, People, Settings } from "@mui/icons-material"; // Importa iconos si usas Material-UI
 
@@ -13,7 +13,7 @@ const AdminLayout = () => {
   return (
     <div style={{ display: "flex" }}>
       {/* Pasamos menuItems al Sidebar */}
-      <Sidebar menuItems={adminMenuItems} />
+      <SidebarComponent menuItems={adminMenuItems} />
       <div style={{ flex: 1, padding: "20px" }}>
         <Outlet /> {/* Aquí se renderizarán las páginas dentro de /admin */}
       </div>
