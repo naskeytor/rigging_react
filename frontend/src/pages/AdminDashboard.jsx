@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
-import SidebarComponent from "../components/Sidebar";
+//import SidebarComponent from "../components/Sidebar";
 import MuiDataGrid from "../components/DatagridTable.jsx";
 import { Box } from "@mui/material";
 import { Dashboard, People, Settings } from "@mui/icons-material";
@@ -15,20 +15,16 @@ const AdminDashboard = () => {
     const { users, loading } = useContext(UserContext);
 
     return (
-        <Box display="flex" height="100vh">
-            <SidebarComponent menuItems={adminMenuItems} />
+        <Box component="main"
+             sx={{
+                 flexGrow: 1,
+                 p: 3,
+                 marginLeft: "80px", // 🔴 Ajuste correcto basado en el ancho del Sidebar
+                 transition: "margin 0.3s ease-in-out",
+             }}
+        >
+            {/* Aquí va el contenido del Dashboard */}
 
-            {/* 🔴 Este contenedor ahora respeta el ancho del sidebar */}
-            <Box component="main"
-                 sx={{
-                     flexGrow: 1,
-                     p: 3,
-                     marginLeft: { xs: "60px", sm: "240px" }, // 🔴 Se ajusta al ancho del sidebar
-                     transition: "margin 0.3s ease-in-out", // 🔴 Suaviza el cambio cuando el sidebar se expande
-                 }}
-            >
-                
-            </Box>
         </Box>
     );
 };

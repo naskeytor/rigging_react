@@ -11,56 +11,50 @@ import {
     Typography,
     IconButton,
 } from "@mui/material";
-import {ExitToApp} from "@mui/icons-material";
-import {styled} from "@mui/system";
-import {useNavigate} from "react-router-dom";
+import { ExitToApp } from "@mui/icons-material";
+import { styled } from "@mui/system";
+import { useNavigate } from "react-router-dom";
 
-const drawerWidth = 80; // 🔴 Sidebar fijo en 80px
+const drawerWidth = 50;
 
-const Sidebar = styled(Drawer)(({theme}) => ({
+const SidebarStyled = styled(Drawer)(({ theme }) => ({
     width: drawerWidth,
     flexShrink: 0,
     whiteSpace: "nowrap",
     boxSizing: "border-box",
-    '& .MuiDrawer-paper': {
+    "& .MuiDrawer-paper": {
         width: drawerWidth,
         overflowX: "hidden",
-        backgroundColor: "#222", // 🔴 Color oscuro para el sidebar
+        backgroundColor: "#000000",
         color: "#fff",
     },
 }));
 
-const AppBarStyled = styled(AppBar)(({theme}) => ({
+const AppBarStyled = styled(AppBar)(({ theme }) => ({
     zIndex: theme.zIndex.drawer + 1,
-    width: `calc(100% - ${drawerWidth}px)`, // 🔴 Ajuste dinámico con sidebar
+    width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: drawerWidth,
+    backgroundColor: "#000000"
 }));
 
-const SidebarComponent = ({menuItems}) => {
+const SidebarComponent = ({ menuItems }) => {
     const navigate = useNavigate();
-
-    const handleLogout = () => {
-        // Aquí puedes limpiar cualquier estado global o token antes de redirigir
-        navigate("/");
-    };
 
     return (
         <>
-            {/* 🔹 AppBar solo con título y logout */}
             <AppBarStyled position="fixed">
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         Dashboard
                     </Typography>
-                    <IconButton color="inherit" onClick={handleLogout}>
-                        <ExitToApp/>
+                    <IconButton color="inherit" onClick={() => navigate("/")}>
+                        <ExitToApp />
                     </IconButton>
                 </Toolbar>
             </AppBarStyled>
 
-            {/* 🔹 Sidebar compacto con íconos */}
-            <Sidebar variant="permanent">
-                <Divider/>
+            <SidebarStyled variant="permanent">
+                <Divider />
                 <List>
                     {menuItems.map((item) => (
                         <Tooltip title={item.text} placement="right" key={item.text}>
@@ -76,7 +70,7 @@ const SidebarComponent = ({menuItems}) => {
                         </Tooltip>
                     ))}
                 </List>
-            </Sidebar>
+            </SidebarStyled>
         </>
     );
 };
